@@ -14,16 +14,26 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.dicoding.fourthmoviecatalogue.R;
 import com.dicoding.fourthmoviecatalogue.model.ModelFavorite;
-import com.dicoding.fourthmoviecatalogue.ui.favorite.MovieFavoriteFragment;
+import com.dicoding.fourthmoviecatalogue.model.ModelMovie;
 
 import java.util.ArrayList;
 
-public class MovieFavoriteAdapater extends RecyclerView.Adapter<MovieFavoriteAdapater.MovieFavoriteViewHolder> {
+public class CardViewMovieFavorite extends RecyclerView.Adapter<CardViewMovieFavorite.MovieFavoriteViewHolder> {
 
     private ArrayList<ModelFavorite> listMovieFavorite = new ArrayList<>();
     private Activity activity;
+    private ArrayList<ModelFavorite> mData;
+    private OnItemClickListener mListener;
 
-    public MovieFavoriteAdapater(Activity activity) {
+    public interface OnItemClickListener{
+        void OnItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mListener = listener;
+    }
+
+    public CardViewMovieFavorite(Activity activity) {
         this.activity = activity;
     }
 
@@ -73,4 +83,8 @@ public class MovieFavoriteAdapater extends RecyclerView.Adapter<MovieFavoriteAda
             imagePoster = itemView.findViewById(R.id.img_item_poster);
         }
     }
+
+    //public ArrayList<ModelMovie> getData(){
+        //return mData;
+    //}
 }
