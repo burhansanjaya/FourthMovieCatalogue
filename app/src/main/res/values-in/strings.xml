@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Fourth Movie Catalogue</string>
+    <string name="title_home">Branda</string>
+    <string name="title_tv_show">Serial Televisi</string>
+    <string name="title_movie">Film</string>
+    <string name="movie_description">Deskripsi</string>
+    <string name="movie_detail">Rincian Film</string>
+    <string name="tv_detail">Rincian Serial TV</string>
+    <string name="title_favorite">Kesukaan</string>
+
+    <string name="movie_title">Judul Film</string>
+    <string name="vote_movie">Rating Film</string>
+    <string name="budget_movie">Biaya Film</string>
+    <string name="revenue_movie">Penghasilan Film</string>
+    <string name="budget_film">Biaya Film</string>
+    <string name="popularity_film">Kepopuleran Film</string>
+    <string name="label_title_movie">Label Judul Film</string>
+    <string name="languague_movie">Bahasa Film</string>
+    <string name="description_movie">Deskripsi Film</string>
+    <string name="change_language_settings">Konfigurasi Ganti Bahasa</string>
+    <string name="btn_favorite">Kesukaan</string>
+    <string name="favorite_movie">Kesukaan Film</string>
+    <string name="favorite_tv">Kesukaan TV Serial</string>
+</resources>
