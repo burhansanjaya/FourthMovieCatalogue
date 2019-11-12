@@ -1,19 +1,25 @@
 package com.dicoding.fourthmoviecatalogue.ui.favorite;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.dicoding.fourthmoviecatalogue.R;
 import com.dicoding.fourthmoviecatalogue.adapter.MovieFavoriteAdapater;
@@ -29,13 +35,20 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MovieFavoriteFragment extends Fragment implements LoadMoviesCallback {
+public class MovieFavoriteFragment extends Fragment implements LoadMoviesCallback, MovieFavoriteAdapater.OnItemClickListener {
 
     private ProgressBar progressBar;
     private RecyclerView rvMovie;
     private MovieFavoriteAdapater adapater;
     private MovieHelper movieHelper;
+    private int position;
+    private ModelFavorite modelFavorite;
     private static final String EXTRA_STATE = "EXTRA_STATE";
+
+    private final int ALERT_DIALOG_CLOSE = 10;
+    public static final int RESULT_DELETE = 301;
+    private final int ALERT_DIALOG_DELETE = 20;
+    public static final String EXTRA_POSITION = "extra_position";
 
     public MovieFavoriteFragment() {
         // Required empty public constructor
@@ -52,6 +65,7 @@ public class MovieFavoriteFragment extends Fragment implements LoadMoviesCallbac
         rvMovie.setHasFixedSize(true);
         adapater = new MovieFavoriteAdapater(getActivity());
         rvMovie.setAdapter(adapater);
+        adapater.setOnItemClickListener(this);
 
         movieHelper = MovieHelper.getInstance(getContext());
         movieHelper.open();
@@ -68,6 +82,24 @@ public class MovieFavoriteFragment extends Fragment implements LoadMoviesCallbac
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == MovieFavoriteFragment.RESULT_DELETE){
+            int position = data.getIntExtra(MovieFavoriteFragment.EXTRA_POSITION, 0);
+            adapater.removeItem(position);
+            showSnackbarMessage("Satu Item Berhasil Dihapus");
+        }
+
+        Log.d("ResultCode", String.valueOf(resultCode));
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        super.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -107,6 +139,11 @@ public class MovieFavoriteFragment extends Fragment implements LoadMoviesCallbac
         }
     }
 
+    @Override
+    public void OnItemClick(int id) {
+        showAlertDialog(ALERT_DIALOG_DELETE, id);
+    }
+
     private static class LoadMoviesAsync extends AsyncTask<Void, Void, ArrayList<ModelFavorite>>{
 
         private final WeakReference<MovieHelper> weakMovieHelper;
@@ -135,6 +172,49 @@ public class MovieFavoriteFragment extends Fragment implements LoadMoviesCallbac
 
             weakCallback.get().postExecute(modelFavorites);
         }
+    }
+
+    private void showAlertDialog(int type, final int idmovie) {
+        final boolean isDialogClose = type == ALERT_DIALOG_CLOSE;
+        String dialogTitle, dialogMessage;
+
+        if (isDialogClose) {
+            dialogTitle = "Batal";
+            dialogMessage = "Apakah anda ingin membatalkan perubahan pada form?";
+        } else {
+            dialogMessage = "Apakah anda yakin ingin menghapus item ini?";
+            dialogTitle = "Hapus Note";
+        }
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+
+        alertDialogBuilder.setTitle(dialogTitle);
+        alertDialogBuilder
+                .setMessage(dialogMessage)
+                .setCancelable(false)
+                .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (isDialogClose) {
+                            getActivity().finish();
+                        } else {
+                            long result = movieHelper.deleteFilm(idmovie);
+                            if (result > 0) {
+                                adapater.removeItem(position);
+                                showSnackbarMessage("Satu Item Berhasil Dihapus");
+                            } else {
+                                Toast.makeText(getActivity(), "Gagal menghapus data", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                })
+                .setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
     }
 }
 
